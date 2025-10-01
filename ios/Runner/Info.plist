@@ -45,5 +45,28 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	
+	<!-- Camera Permission -->
+	<key>NSCameraUsageDescription</key>
+	<string>FODO needs access to your camera to take photos of food donations.</string>
+	
+	<!-- Photo Library Permission -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>FODO needs access to your photo library to select photos of food donations.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>FODO needs access to save photos to your photo library.</string>
+	
+	<!-- Location Permissions -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>FODO needs your location to show nearby NGOs and help with food donation pickups.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>FODO needs your location to provide donation tracking and nearby NGO alerts.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>FODO needs your location to show nearby donations and optimize food distribution.</string>
+	
+	<!-- Microphone Permission (optional, if video recording is needed) -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>FODO may need access to your microphone for video recordings.</string>
+	
 </dict>
 </plist>
