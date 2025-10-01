@@ -19,6 +19,7 @@ import 'features/ngo/data/repositories/ngo_repository_impl.dart';
 import 'features/ngo/presentation/providers/ngo_provider.dart';
 import 'features/ngo/presentation/pages/ngo_dashboard_page.dart';
 import 'core/constants/app_constants.dart';
+import 'core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -116,32 +117,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'FODO - Food Donation Bridge',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.green,
-            brightness: Brightness.light,
-          ),
-          useMaterial3: true,
-          appBarTheme: const AppBarTheme(
-            centerTitle: true,
-            elevation: 0,
-          ),
-          inputDecorationTheme: InputDecorationTheme(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            filled: true,
-            fillColor: Colors.grey[50],
-          ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-        ),
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeMode.light, // Can be changed to ThemeMode.system for system preference
         home: Consumer<AuthProvider>(
           builder: (context, authProvider, _) {
             // Show loading while checking auth status
