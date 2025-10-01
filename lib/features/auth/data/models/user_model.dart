@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import '../../../../core/constants/app_constants.dart';
 
 /// User Model
@@ -37,11 +37,10 @@ class UserModel {
     this.lastLoginAt,
   });
 
-  /// Convert from Firestore document
-  factory UserModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+  /// Convert from Realtime Database
+  factory UserModel.fromDatabase(Map<String, dynamic> data, String userId) {
     return UserModel(
-      userId: doc.id,
+      userId: userId,
       userType: UserType.fromString(data['userType'] ?? 'donor'),
       email: data['email'] ?? '',
       phoneNumber: data['phoneNumber'] ?? '',
@@ -55,14 +54,20 @@ class UserModel {
       ),
       statistics: UserStatistics.fromMap(data['statistics'] ?? {}),
       status: data['status'] ?? 'active',
-      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      lastLoginAt: (data['lastLoginAt'] as Timestamp?)?.toDate(),
+      createdAt: data['createdAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(data['createdAt'] as int)
+          : DateTime.now(),
+      updatedAt: data['updatedAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(data['updatedAt'] as int)
+          : DateTime.now(),
+      lastLoginAt: data['lastLoginAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(data['lastLoginAt'] as int)
+          : null,
     );
   }
 
-  /// Convert to Firestore document
-  Map<String, dynamic> toFirestore() {
+  /// Convert to Realtime Database
+  Map<String, dynamic> toDatabase() {
     return {
       'userType': userType.value,
       'email': email,
@@ -75,9 +80,9 @@ class UserModel {
       'notificationPreferences': notificationPreferences.toMap(),
       'statistics': statistics.toMap(),
       'status': status,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'updatedAt': Timestamp.fromDate(updatedAt),
-      'lastLoginAt': lastLoginAt != null ? Timestamp.fromDate(lastLoginAt!) : null,
+      'createdAt': ServerValue.timestamp,
+      'updatedAt': ServerValue.timestamp,
+      'lastLoginAt': lastLoginAt?.millisecondsSinceEpoch,
     };
   }
 
