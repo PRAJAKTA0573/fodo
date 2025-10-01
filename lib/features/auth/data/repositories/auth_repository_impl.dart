@@ -90,15 +90,21 @@ class AuthRepositoryImpl {
     required double longitude,
   }) async {
     try {
+      print('🔵 Starting NGO registration for: $email');
+      
       // Create auth user
+      print('🔵 Creating Firebase Auth user...');
       final userCredential = await _authService.registerWithEmail(
         email: email,
         password: password,
       );
 
       if (userCredential.user == null) {
+        print('❌ User credential is null');
         return const Left('Registration failed');
       }
+
+      print('✅ Firebase Auth user created: ${userCredential.user!.uid}');
 
       // Create user model
       final user = UserModel(
@@ -127,9 +133,12 @@ class AuthRepositoryImpl {
       );
 
       // Save user to database
+      print('🔵 Saving user to database...');
       await _dbService.setUser(user.userId, user.toDatabase());
+      print('✅ User saved to database');
 
       // Create NGO entry with pending verification
+      print('🔵 Creating NGO entry...');
       await _dbService.setNGO(user.userId, {
         'ngoName': ngoName,
         'registrationNumber': registrationNumber,
@@ -140,13 +149,23 @@ class AuthRepositoryImpl {
         'createdAt': DateTime.now().millisecondsSinceEpoch,
         'updatedAt': DateTime.now().millisecondsSinceEpoch,
       });
+      print('✅ NGO entry created');
 
       // Send email verification
-      await _authService.sendEmailVerification();
+      print('🔵 Sending email verification...');
+      try {
+        await _authService.sendEmailVerification();
+        print('✅ Email verification sent');
+      } catch (e) {
+        print('⚠️ Email verification failed (non-fatal): $e');
+      }
 
+      print('🎉 NGO registration completed successfully!');
       return Right(user);
     } catch (e) {
-      return Left(e.toString());
+      print('❌ NGO registration error: $e');
+      print('❌ Error type: ${e.runtimeType}');
+      return Left('Registration failed: ${e.toString()}');
     }
   }
 

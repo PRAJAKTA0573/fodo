@@ -1,0 +1,34 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    
+    "users": {
+      "$userId": {
+        ".read": "$userId === auth.uid || root.child('users/' + auth.uid + '/userType').val() === 'admin'",
+        ".write": "$userId === auth.uid || root.child('users/' + auth.uid + '/userType').val() === 'admin'"
+      }
+    },
+    
+    "ngos": {
+      "$ngoId": {
+        ".read": "auth != null",
+        ".write": "$ngoId === auth.uid || root.child('users/' + auth.uid + '/userType').val() === 'admin'"
+      }
+    },
+    
+    "donations": {
+      ".read": "auth != null",
+      "$donationId": {
+        ".write": "auth != null"
+      }
+    },
+    
+    "notifications": {
+      "$userId": {
+        ".read": "$userId === auth.uid",
+        ".write": "auth != null"
+      }
+    }
+  }
+}
