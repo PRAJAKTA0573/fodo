@@ -42,6 +42,7 @@ dependencies:
   firebase_messaging: ^16.0.2
   firebase_analytics: ^12.0.2
   firebase_crashlytics: ^5.0.2
+  google_sign_in: ^6.2.1
   
   # State Management
   provider: ^6.1.2

@@ -21,8 +21,8 @@ class RealtimeDatabaseService {
   Future<Map<String, dynamic>?> getUser(String userId) async {
     try {
       final snapshot = await _database.child('users/$userId').get();
-      if (snapshot.exists) {
-        return Map<String, dynamic>.from(snapshot.value as Map);
+      if (snapshot.exists && snapshot.value != null) {
+        return Map<String, dynamic>.from(snapshot.value as Map<Object?, Object?>);
       }
       return null;
     } catch (e) {
@@ -76,12 +76,12 @@ class RealtimeDatabaseService {
           .limitToFirst(1)
           .get();
 
-      if (snapshot.exists) {
-        final data = Map<String, dynamic>.from(snapshot.value as Map);
+      if (snapshot.exists && snapshot.value != null) {
+        final data = Map<String, dynamic>.from(snapshot.value as Map<Object?, Object?>);
         final userId = data.keys.first;
         return {
           'userId': userId,
-          ...Map<String, dynamic>.from(data[userId] as Map),
+          ...Map<String, dynamic>.from(data[userId] as Map<Object?, Object?>),
         };
       }
       return null;
@@ -105,8 +105,8 @@ class RealtimeDatabaseService {
   Future<Map<String, dynamic>?> getNGO(String ngoId) async {
     try {
       final snapshot = await _database.child('ngos/$ngoId').get();
-      if (snapshot.exists) {
-        return Map<String, dynamic>.from(snapshot.value as Map);
+      if (snapshot.exists && snapshot.value != null) {
+        return Map<String, dynamic>.from(snapshot.value as Map<Object?, Object?>);
       }
       return null;
     } catch (e) {
@@ -150,8 +150,8 @@ class RealtimeDatabaseService {
   /// Listen to user data changes
   Stream<Map<String, dynamic>?> watchUser(String userId) {
     return _database.child('users/$userId').onValue.map((event) {
-      if (event.snapshot.exists) {
-        return Map<String, dynamic>.from(event.snapshot.value as Map);
+      if (event.snapshot.exists && event.snapshot.value != null) {
+        return Map<String, dynamic>.from(event.snapshot.value as Map<Object?, Object?>);
       }
       return null;
     });
@@ -160,8 +160,8 @@ class RealtimeDatabaseService {
   /// Listen to NGO data changes
   Stream<Map<String, dynamic>?> watchNGO(String ngoId) {
     return _database.child('ngos/$ngoId').onValue.map((event) {
-      if (event.snapshot.exists) {
-        return Map<String, dynamic>.from(event.snapshot.value as Map);
+      if (event.snapshot.exists && event.snapshot.value != null) {
+        return Map<String, dynamic>.from(event.snapshot.value as Map<Object?, Object?>);
       }
       return null;
     });
@@ -189,12 +189,12 @@ class RealtimeDatabaseService {
           .equalTo('pending')
           .get();
 
-      if (snapshot.exists) {
-        final data = Map<String, dynamic>.from(snapshot.value as Map);
+      if (snapshot.exists && snapshot.value != null) {
+        final data = Map<String, dynamic>.from(snapshot.value as Map<Object?, Object?>);
         return data.entries.map((entry) {
           return {
             'ngoId': entry.key,
-            ...Map<String, dynamic>.from(entry.value as Map),
+            ...Map<String, dynamic>.from(entry.value as Map<Object?, Object?>),
           };
         }).toList();
       }
@@ -216,7 +216,7 @@ class RealtimeDatabaseService {
         if (currentData == null) {
           return Transaction.success(update(null));
         }
-        final data = Map<String, dynamic>.from(currentData as Map);
+        final data = Map<String, dynamic>.from(currentData as Map<Object?, Object?>);
         return Transaction.success(update(data));
       });
     } catch (e) {

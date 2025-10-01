@@ -23,10 +23,15 @@ import 'core/constants/app_constants.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // Initialize Firebase with proper error handling
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    // Firebase already initialized, continue
+    print('Firebase already initialized: $e');
+  }
 
   runApp(const MyApp());
 }
@@ -62,9 +67,16 @@ class MyApp extends StatelessWidget {
         
         // Providers
         ChangeNotifierProvider(
-          create: (context) => AuthProvider(
-            context.read<AuthRepositoryImpl>(),
-          )..checkAuthStatus(),
+          create: (context) {
+            final authProvider = AuthProvider(
+              context.read<AuthRepositoryImpl>(),
+            );
+            // Check auth status after frame is built
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              authProvider.checkAuthStatus();
+            });
+            return authProvider;
+          },
         ),
         ChangeNotifierProxyProvider<AuthProvider, DonationProvider>(
           create: (context) => DonationProvider(

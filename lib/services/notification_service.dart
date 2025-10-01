@@ -147,7 +147,7 @@ class NotificationService {
       
       final Map<dynamic, dynamic> notificationsMap = data as Map<dynamic, dynamic>;
       final notifications = notificationsMap.entries.map((entry) {
-        final notificationData = Map<String, dynamic>.from(entry.value as Map);
+        final notificationData = Map<String, dynamic>.from(entry.value as Map<Object?, Object?>);
         return NotificationModel.fromDatabase(notificationData, entry.key.toString());
       }).toList();
       

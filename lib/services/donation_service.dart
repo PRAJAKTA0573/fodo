@@ -36,7 +36,7 @@ class DonationService {
         return const Left('Donation not found');
       }
 
-      final data = Map<String, dynamic>.from(snapshot.value as Map);
+      final data = Map<String, dynamic>.from(snapshot.value as Map<Object?, Object?>);
       final donation = DonationModel.fromDatabase(data, donationId);
 
       return Right(donation);
@@ -61,10 +61,10 @@ class DonationService {
       }
 
       final donations = <DonationModel>[];
-      final data = Map<String, dynamic>.from(snapshot.value as Map);
+      final data = Map<String, dynamic>.from(snapshot.value as Map<Object?, Object?>);
 
       data.forEach((key, value) {
-        final donationData = Map<String, dynamic>.from(value as Map);
+        final donationData = Map<String, dynamic>.from(value as Map<Object?, Object?>);
         donations.add(DonationModel.fromDatabase(donationData, key));
       });
 
@@ -242,7 +242,7 @@ class DonationService {
     return _donationsRef.child(donationId).onValue.map((event) {
       if (!event.snapshot.exists) return null;
       
-      final data = Map<String, dynamic>.from(event.snapshot.value as Map);
+      final data = Map<String, dynamic>.from(event.snapshot.value as Map<Object?, Object?>);
       return DonationModel.fromDatabase(data, donationId);
     });
   }
@@ -257,10 +257,10 @@ class DonationService {
       if (!event.snapshot.exists) return <DonationModel>[];
 
       final donations = <DonationModel>[];
-      final data = Map<String, dynamic>.from(event.snapshot.value as Map);
+      final data = Map<String, dynamic>.from(event.snapshot.value as Map<Object?, Object?>);
 
       data.forEach((key, value) {
-        final donationData = Map<String, dynamic>.from(value as Map);
+        final donationData = Map<String, dynamic>.from(value as Map<Object?, Object?>);
         donations.add(DonationModel.fromDatabase(donationData, key));
       });
 

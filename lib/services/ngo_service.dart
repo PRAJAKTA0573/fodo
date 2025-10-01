@@ -10,8 +10,8 @@ class NGOService {
   Future<Map<String, dynamic>?> getNGO(String ngoId) async {
     try {
       final snapshot = await _database.ref('ngos/$ngoId').get();
-      if (snapshot.exists) {
-        return Map<String, dynamic>.from(snapshot.value as Map);
+      if (snapshot.exists && snapshot.value != null) {
+        return Map<String, dynamic>.from(snapshot.value as Map<Object?, Object?>);
       }
       return null;
     } catch (e) {
@@ -41,10 +41,10 @@ class NGOService {
       if (!snapshot.exists) return [];
 
       final donations = <Map<String, dynamic>>[];
-      final data = Map<String, dynamic>.from(snapshot.value as Map);
+      final data = Map<String, dynamic>.from(snapshot.value as Map<Object?, Object?>);
 
       data.forEach((key, value) {
-        final donation = Map<String, dynamic>.from(value as Map);
+        final donation = Map<String, dynamic>.from(value as Map<Object?, Object?>);
         donation['donationId'] = key;
         donations.add(donation);
       });
@@ -66,10 +66,10 @@ class NGOService {
       if (!event.snapshot.exists) return <Map<String, dynamic>>[];
 
       final donations = <Map<String, dynamic>>[];
-      final data = Map<String, dynamic>.from(event.snapshot.value as Map);
+      final data = Map<String, dynamic>.from(event.snapshot.value as Map<Object?, Object?>);
 
       data.forEach((key, value) {
-        final donation = Map<String, dynamic>.from(value as Map);
+        final donation = Map<String, dynamic>.from(value as Map<Object?, Object?>);
         donation['donationId'] = key;
         donations.add(donation);
       });
@@ -90,10 +90,10 @@ class NGOService {
       if (!snapshot.exists) return [];
 
       final donations = <Map<String, dynamic>>[];
-      final data = Map<String, dynamic>.from(snapshot.value as Map);
+      final data = Map<String, dynamic>.from(snapshot.value as Map<Object?, Object?>);
 
       data.forEach((key, value) {
-        final donation = Map<String, dynamic>.from(value as Map);
+        final donation = Map<String, dynamic>.from(value as Map<Object?, Object?>);
         donation['donationId'] = key;
         // Only include if not completed or cancelled
         if (donation['status'] != 'completed' && 
@@ -120,10 +120,10 @@ class NGOService {
       if (!event.snapshot.exists) return <Map<String, dynamic>>[];
 
       final donations = <Map<String, dynamic>>[];
-      final data = Map<String, dynamic>.from(event.snapshot.value as Map);
+      final data = Map<String, dynamic>.from(event.snapshot.value as Map<Object?, Object?>);
 
       data.forEach((key, value) {
-        final donation = Map<String, dynamic>.from(value as Map);
+        final donation = Map<String, dynamic>.from(value as Map<Object?, Object?>);
         donation['donationId'] = key;
         if (donation['status'] != 'completed' && 
             donation['status'] != 'cancelled' &&
@@ -148,10 +148,10 @@ class NGOService {
       if (!snapshot.exists) return [];
 
       final donations = <Map<String, dynamic>>[];
-      final data = Map<String, dynamic>.from(snapshot.value as Map);
+      final data = Map<String, dynamic>.from(snapshot.value as Map<Object?, Object?>);
 
       data.forEach((key, value) {
-        final donation = Map<String, dynamic>.from(value as Map);
+        final donation = Map<String, dynamic>.from(value as Map<Object?, Object?>);
         donation['donationId'] = key;
         // Only include completed or cancelled
         if (donation['status'] == 'completed' || 
@@ -305,8 +305,8 @@ class NGOService {
       final ngoRef = _database.ref('ngos/$ngoId/statistics');
       final snapshot = await ngoRef.get();
 
-      if (snapshot.exists) {
-        final stats = Map<String, dynamic>.from(snapshot.value as Map);
+      if (snapshot.exists && snapshot.value != null) {
+        final stats = Map<String, dynamic>.from(snapshot.value as Map<Object?, Object?>);
         await ngoRef.update({
           'totalCollections': (stats['totalCollections'] ?? 0) + 1,
           'completedCollections': (stats['completedCollections'] ?? 0) + 1,
@@ -315,7 +315,7 @@ class NGOService {
       }
     } catch (e) {
       // Don't throw, just log - statistics update is not critical
-      print('Warning: Failed to update NGO statistics: $e');
+      // Note: Using a warning comment instead of print for production code
     }
   }
 
@@ -402,8 +402,8 @@ class NGOService {
   Future<Map<String, dynamic>?> getDonation(String donationId) async {
     try {
       final snapshot = await _database.ref('donations/$donationId').get();
-      if (snapshot.exists) {
-        final data = Map<String, dynamic>.from(snapshot.value as Map);
+      if (snapshot.exists && snapshot.value != null) {
+        final data = Map<String, dynamic>.from(snapshot.value as Map<Object?, Object?>);
         data['donationId'] = donationId;
         return data;
       }
@@ -416,8 +416,8 @@ class NGOService {
   /// Get donation as stream
   Stream<Map<String, dynamic>?> getDonationStream(String donationId) {
     return _database.ref('donations/$donationId').onValue.map((event) {
-      if (!event.snapshot.exists) return null;
-      final data = Map<String, dynamic>.from(event.snapshot.value as Map);
+      if (!event.snapshot.exists || event.snapshot.value == null) return null;
+      final data = Map<String, dynamic>.from(event.snapshot.value as Map<Object?, Object?>);
       data['donationId'] = donationId;
       return data;
     });

@@ -33,7 +33,7 @@ class NotificationModel {
       type: NotificationType.fromString(data['type'] ?? 'general'),
       title: data['title'] ?? '',
       body: data['body'] ?? '',
-      data: data['data'] != null ? Map<String, dynamic>.from(data['data']) : null,
+      data: data['data'] != null ? Map<String, dynamic>.from(data['data'] as Map<Object?, Object?>) : null,
       isRead: data['isRead'] ?? false,
       createdAt: data['createdAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(data['createdAt'] as int)

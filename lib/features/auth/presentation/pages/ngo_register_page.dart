@@ -15,13 +15,10 @@ class _NgoRegisterPageState extends State<NgoRegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _scrollController = ScrollController();
 
-  // NGO Details Controllers
+  // NGO Details Controllers (no email/password for Google Sign-In)
   final _ngoNameController = TextEditingController();
   final _registrationNumberController = TextEditingController();
-  final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
 
   // Contact Person Controllers
   final _contactNameController = TextEditingController();
@@ -45,10 +42,7 @@ class _NgoRegisterPageState extends State<NgoRegisterPage> {
   void dispose() {
     _ngoNameController.dispose();
     _registrationNumberController.dispose();
-    _emailController.dispose();
     _phoneController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
     _contactNameController.dispose();
     _contactDesignationController.dispose();
     _contactPhoneController.dispose();
@@ -62,16 +56,6 @@ class _NgoRegisterPageState extends State<NgoRegisterPage> {
     super.dispose();
   }
 
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Email is required';
-    }
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value)) {
-      return 'Enter a valid email';
-    }
-    return null;
-  }
 
   String? _validatePhone(String? value) {
     if (value == null || value.isEmpty) {
@@ -83,22 +67,6 @@ class _NgoRegisterPageState extends State<NgoRegisterPage> {
     return null;
   }
 
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Password is required';
-    }
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters';
-    }
-    return null;
-  }
-
-  String? _validateConfirmPassword(String? value) {
-    if (value != _passwordController.text) {
-      return 'Passwords do not match';
-    }
-    return null;
-  }
 
   String? _validatePincode(String? value) {
     if (value == null || value.isEmpty) {
@@ -127,15 +95,13 @@ class _NgoRegisterPageState extends State<NgoRegisterPage> {
 
     final authProvider = context.read<AuthProvider>();
 
+    // Complete Google Sign-In registration for NGO
     // Note: Coordinates would normally come from location picker/geocoding
     // For now, using placeholder values (0,0)
-    await authProvider.registerNGO(
+    await authProvider.completeGoogleSignInNGO(
       ngoName: _ngoNameController.text.trim(),
       registrationNumber: _registrationNumberController.text.trim(),
-      email: _emailController.text.trim(),
       phoneNumber: _phoneController.text.trim(),
-      password: _passwordController.text,
-      contactPersonName: _contactNameController.text.trim(),
       address: _addressController.text.trim(),
       city: _cityController.text.trim(),
       state: _stateController.text.trim(),
@@ -155,7 +121,7 @@ class _NgoRegisterPageState extends State<NgoRegisterPage> {
           duration: Duration(seconds: 4),
         ),
       );
-      // Navigate back to login
+      // Navigate back to home (will redirect to dashboard)
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
@@ -188,7 +154,7 @@ class _NgoRegisterPageState extends State<NgoRegisterPage> {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      'Register Your NGO',
+                      'Complete Your NGO Profile',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 24,
@@ -197,7 +163,7 @@ class _NgoRegisterPageState extends State<NgoRegisterPage> {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      'Join us in collecting and distributing food to those in need',
+                      'Provide organization details to complete registration',
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.grey),
                     ),
@@ -262,16 +228,6 @@ class _NgoRegisterPageState extends State<NgoRegisterPage> {
                     const SizedBox(height: 16),
 
                     AuthTextField(
-                      controller: _emailController,
-                      label: 'Official Email',
-                      hint: 'ngo@example.org',
-                      prefixIcon: Icons.email,
-                      keyboardType: TextInputType.emailAddress,
-                      validator: _validateEmail,
-                    ),
-                    const SizedBox(height: 16),
-
-                    AuthTextField(
                       controller: _phoneController,
                       label: 'Official Phone',
                       hint: '10-digit contact number',
@@ -321,14 +277,6 @@ class _NgoRegisterPageState extends State<NgoRegisterPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    AuthTextField(
-                      controller: _contactEmailController,
-                      label: 'Contact Email',
-                      hint: 'contact.person@example.com',
-                      prefixIcon: Icons.alternate_email,
-                      keyboardType: TextInputType.emailAddress,
-                      validator: _validateEmail,
-                    ),
                     const SizedBox(height: 32),
 
                     // Location Information
@@ -394,29 +342,6 @@ class _NgoRegisterPageState extends State<NgoRegisterPage> {
                       validator: (value) => value?.isEmpty ?? true
                           ? 'At least one service area is required'
                           : null,
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Security Information
-                    const AuthSectionHeader(
-                      title: 'Account Security',
-                      subtitle: 'Create a secure password for your account',
-                    ),
-                    const SizedBox(height: 16),
-
-                    AuthPasswordField(
-                      controller: _passwordController,
-                      label: 'Password',
-                      hint: 'At least 6 characters',
-                      validator: _validatePassword,
-                    ),
-                    const SizedBox(height: 16),
-
-                    AuthPasswordField(
-                      controller: _confirmPasswordController,
-                      label: 'Confirm Password',
-                      hint: 'Re-enter password',
-                      validator: _validateConfirmPassword,
                     ),
                     const SizedBox(height: 24),
 

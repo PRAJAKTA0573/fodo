@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:logger/logger.dart';
 import '../../../../services/firebase_auth_service.dart';
 import '../../../../services/realtime_database_service.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -8,8 +9,162 @@ import '../models/user_model.dart';
 class AuthRepositoryImpl {
   final FirebaseAuthService _authService;
   final RealtimeDatabaseService _dbService;
+  final Logger _logger = Logger();
 
   AuthRepositoryImpl(this._authService, this._dbService);
+
+  /// Sign in with Google
+  Future<Either<String, UserModel>> signInWithGoogle() async {
+    try {
+      _logger.i('Starting Google Sign-In...');
+      
+      final userCredential = await _authService.signInWithGoogle();
+      
+      if (userCredential.user == null) {
+        return const Left('Google sign in failed');
+      }
+      
+      _logger.i('Google sign in successful: ${userCredential.user!.uid}');
+      
+      // Check if user exists in database
+      final userData = await _dbService.getUser(userCredential.user!.uid);
+      
+      if (userData != null) {
+        // Existing user - login
+        _logger.i('Existing user found');
+        final user = UserModel.fromDatabase(userData, userCredential.user!.uid);
+        return Right(user);
+      } else {
+        // New user - return null to trigger registration flow
+        _logger.i('New user - needs to complete registration');
+        return const Left('NEW_USER');
+      }
+    } catch (e) {
+      _logger.e('Google sign in error: $e');
+      return Left(e.toString());
+    }
+  }
+
+  /// Complete Google Sign-In registration for Donor
+  Future<Either<String, UserModel>> completeGoogleSignInDonor({
+    required String userId,
+    required String email,
+    required String displayName,
+    required String phoneNumber,
+    required String address,
+    required String city,
+    required String state,
+    required String pincode,
+    required double latitude,
+    required double longitude,
+    String? organizationName,
+  }) async {
+    try {
+      _logger.i('Completing donor registration for Google user: $userId');
+      
+      // Create user model
+      final user = UserModel(
+        userId: userId,
+        userType: UserType.donor,
+        email: email,
+        phoneNumber: phoneNumber,
+        profileData: ProfileData(
+          fullName: displayName,
+          organizationName: organizationName,
+        ),
+        location: Location(
+          address: address,
+          city: city,
+          state: state,
+          pincode: pincode,
+          coordinates: Coordinates(
+            latitude: latitude,
+            longitude: longitude,
+          ),
+        ),
+        notificationPreferences: NotificationPreferences(),
+        statistics: UserStatistics(),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
+      // Save to database
+      await _dbService.setUser(user.userId, user.toDatabase());
+      _logger.i('Donor registration completed');
+      
+      return Right(user);
+    } catch (e) {
+      _logger.e('Complete donor registration error: $e');
+      return Left(e.toString());
+    }
+  }
+
+  /// Complete Google Sign-In registration for NGO
+  Future<Either<String, UserModel>> completeGoogleSignInNGO({
+    required String userId,
+    required String email,
+    required String displayName,
+    required String ngoName,
+    required String registrationNumber,
+    required String phoneNumber,
+    required String address,
+    required String city,
+    required String state,
+    required String pincode,
+    required double latitude,
+    required double longitude,
+  }) async {
+    try {
+      _logger.i('Completing NGO registration for Google user: $userId');
+      
+      // Create user model
+      final user = UserModel(
+        userId: userId,
+        userType: UserType.ngo,
+        email: email,
+        phoneNumber: phoneNumber,
+        profileData: ProfileData(
+          fullName: displayName,
+          organizationName: ngoName,
+        ),
+        location: Location(
+          address: address,
+          city: city,
+          state: state,
+          pincode: pincode,
+          coordinates: Coordinates(
+            latitude: latitude,
+            longitude: longitude,
+          ),
+        ),
+        notificationPreferences: NotificationPreferences(),
+        statistics: UserStatistics(),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
+      // Save user to database
+      await _dbService.setUser(user.userId, user.toDatabase());
+
+      // Create NGO entry with pending verification
+      await _dbService.setNGO(user.userId, {
+        'ngoName': ngoName,
+        'registrationNumber': registrationNumber,
+        'verification': {
+          'status': 'pending',
+          'submittedAt': DateTime.now().millisecondsSinceEpoch,
+        },
+        'createdAt': DateTime.now().millisecondsSinceEpoch,
+        'updatedAt': DateTime.now().millisecondsSinceEpoch,
+      });
+      
+      _logger.i('NGO registration completed');
+      return Right(user);
+    } catch (e) {
+      _logger.e('Complete NGO registration error: $e');
+      return Left(e.toString());
+    }
+  }
 
   /// Register a new donor
   Future<Either<String, UserModel>> registerDonor({
@@ -90,21 +245,21 @@ class AuthRepositoryImpl {
     required double longitude,
   }) async {
     try {
-      print('🔵 Starting NGO registration for: $email');
+      _logger.i('Starting NGO registration for: $email');
       
       // Create auth user
-      print('🔵 Creating Firebase Auth user...');
+      _logger.i('Creating Firebase Auth user...');
       final userCredential = await _authService.registerWithEmail(
         email: email,
         password: password,
       );
 
       if (userCredential.user == null) {
-        print('❌ User credential is null');
+        _logger.e('User credential is null');
         return const Left('Registration failed');
       }
 
-      print('✅ Firebase Auth user created: ${userCredential.user!.uid}');
+      _logger.i('Firebase Auth user created: ${userCredential.user!.uid}');
 
       // Create user model
       final user = UserModel(
@@ -133,12 +288,12 @@ class AuthRepositoryImpl {
       );
 
       // Save user to database
-      print('🔵 Saving user to database...');
+      _logger.i('Saving user to database...');
       await _dbService.setUser(user.userId, user.toDatabase());
-      print('✅ User saved to database');
+      _logger.i('User saved to database');
 
       // Create NGO entry with pending verification
-      print('🔵 Creating NGO entry...');
+      _logger.i('Creating NGO entry...');
       await _dbService.setNGO(user.userId, {
         'ngoName': ngoName,
         'registrationNumber': registrationNumber,
@@ -149,22 +304,22 @@ class AuthRepositoryImpl {
         'createdAt': DateTime.now().millisecondsSinceEpoch,
         'updatedAt': DateTime.now().millisecondsSinceEpoch,
       });
-      print('✅ NGO entry created');
+      _logger.i('NGO entry created');
 
       // Send email verification
-      print('🔵 Sending email verification...');
+      _logger.i('Sending email verification...');
       try {
         await _authService.sendEmailVerification();
-        print('✅ Email verification sent');
+        _logger.i('Email verification sent');
       } catch (e) {
-        print('⚠️ Email verification failed (non-fatal): $e');
+        _logger.w('Email verification failed (non-fatal): $e');
       }
 
-      print('🎉 NGO registration completed successfully!');
+      _logger.i('NGO registration completed successfully!');
       return Right(user);
     } catch (e) {
-      print('❌ NGO registration error: $e');
-      print('❌ Error type: ${e.runtimeType}');
+      _logger.e('NGO registration error: $e');
+      _logger.e('Error type: ${e.runtimeType}');
       return Left('Registration failed: ${e.toString()}');
     }
   }

@@ -15,12 +15,8 @@ class _DonorRegisterPageState extends State<DonorRegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _scrollController = ScrollController();
 
-  // Controllers
-  final _fullNameController = TextEditingController();
-  final _emailController = TextEditingController();
+  // Controllers (no email/password needed for Google Sign-In)
   final _phoneController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
   final _organizationController = TextEditingController();
   final _addressController = TextEditingController();
   final _cityController = TextEditingController();
@@ -31,11 +27,7 @@ class _DonorRegisterPageState extends State<DonorRegisterPage> {
 
   @override
   void dispose() {
-    _fullNameController.dispose();
-    _emailController.dispose();
     _phoneController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
     _organizationController.dispose();
     _addressController.dispose();
     _cityController.dispose();
@@ -45,16 +37,6 @@ class _DonorRegisterPageState extends State<DonorRegisterPage> {
     super.dispose();
   }
 
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Email is required';
-    }
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value)) {
-      return 'Enter a valid email';
-    }
-    return null;
-  }
 
   String? _validatePhone(String? value) {
     if (value == null || value.isEmpty) {
@@ -66,22 +48,6 @@ class _DonorRegisterPageState extends State<DonorRegisterPage> {
     return null;
   }
 
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Password is required';
-    }
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters';
-    }
-    return null;
-  }
-
-  String? _validateConfirmPassword(String? value) {
-    if (value != _passwordController.text) {
-      return 'Passwords do not match';
-    }
-    return null;
-  }
 
   String? _validatePincode(String? value) {
     if (value == null || value.isEmpty) {
@@ -110,13 +76,11 @@ class _DonorRegisterPageState extends State<DonorRegisterPage> {
 
     final authProvider = context.read<AuthProvider>();
 
+    // Complete Google Sign-In registration
     // Note: Coordinates would normally come from location picker/geocoding
     // For now, using placeholder values (0,0)
-    await authProvider.registerDonor(
-      fullName: _fullNameController.text.trim(),
-      email: _emailController.text.trim(),
+    await authProvider.completeGoogleSignInDonor(
       phoneNumber: _phoneController.text.trim(),
-      password: _passwordController.text,
       address: _addressController.text.trim(),
       city: _cityController.text.trim(),
       state: _stateController.text.trim(),
@@ -132,11 +96,11 @@ class _DonorRegisterPageState extends State<DonorRegisterPage> {
       // Registration successful
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Registration successful! Please verify your email.'),
+          content: Text('Registration successful!'),
           backgroundColor: Colors.green,
         ),
       );
-      // Navigate back to login
+      // Navigate back to home (will redirect to dashboard)
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
@@ -169,7 +133,7 @@ class _DonorRegisterPageState extends State<DonorRegisterPage> {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      'Become a Food Donor',
+                      'Complete Your Donor Profile',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 24,
@@ -178,36 +142,16 @@ class _DonorRegisterPageState extends State<DonorRegisterPage> {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      'Help reduce food waste and feed those in need',
+                      'Tell us a bit more about yourself to get started',
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.grey),
                     ),
                     const SizedBox(height: 32),
 
-                    // Personal Information Section
+                    // Contact Information Section
                     const AuthSectionHeader(
-                      title: 'Personal Information',
-                      subtitle: 'Tell us about yourself',
-                    ),
-                    const SizedBox(height: 16),
-
-                    AuthTextField(
-                      controller: _fullNameController,
-                      label: 'Full Name',
-                      hint: 'Enter your full name',
-                      prefixIcon: Icons.person,
-                      validator: (value) =>
-                          value?.isEmpty ?? true ? 'Name is required' : null,
-                    ),
-                    const SizedBox(height: 16),
-
-                    AuthTextField(
-                      controller: _emailController,
-                      label: 'Email Address',
-                      hint: 'your.email@example.com',
-                      prefixIcon: Icons.email,
-                      keyboardType: TextInputType.emailAddress,
-                      validator: _validateEmail,
+                      title: 'Contact Information',
+                      subtitle: 'How can NGOs reach you?',
                     ),
                     const SizedBox(height: 16),
 
@@ -281,29 +225,6 @@ class _DonorRegisterPageState extends State<DonorRegisterPage> {
                       keyboardType: TextInputType.number,
                       validator: _validatePincode,
                       maxLength: 6,
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Security Section
-                    const AuthSectionHeader(
-                      title: 'Security',
-                      subtitle: 'Create a secure password',
-                    ),
-                    const SizedBox(height: 16),
-
-                    AuthPasswordField(
-                      controller: _passwordController,
-                      label: 'Password',
-                      hint: 'At least 6 characters',
-                      validator: _validatePassword,
-                    ),
-                    const SizedBox(height: 16),
-
-                    AuthPasswordField(
-                      controller: _confirmPasswordController,
-                      label: 'Confirm Password',
-                      hint: 'Re-enter password',
-                      validator: _validateConfirmPassword,
                     ),
                     const SizedBox(height: 24),
 

@@ -46,6 +46,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '192098989997',
     projectId: 'fodo-70bc6',
     authDomain: 'fodo-70bc6.firebaseapp.com',
+    databaseURL: 'https://fodo-70bc6-default-rtdb.firebaseio.com',
     storageBucket: 'fodo-70bc6.firebasestorage.app',
     measurementId: 'G-7EYQPKQK1Y',
   );
@@ -55,6 +56,7 @@ class DefaultFirebaseOptions {
     appId: '1:192098989997:android:2d5c07c3ca484b61aa5324',
     messagingSenderId: '192098989997',
     projectId: 'fodo-70bc6',
+    databaseURL: 'https://fodo-70bc6-default-rtdb.firebaseio.com',
     storageBucket: 'fodo-70bc6.firebasestorage.app',
   );
 
@@ -63,6 +65,7 @@ class DefaultFirebaseOptions {
     appId: '1:192098989997:ios:3383f249b83240a5aa5324',
     messagingSenderId: '192098989997',
     projectId: 'fodo-70bc6',
+    databaseURL: 'https://fodo-70bc6-default-rtdb.firebaseio.com',
     storageBucket: 'fodo-70bc6.firebasestorage.app',
     iosBundleId: 'com.example.fodo',
   );
@@ -72,6 +75,7 @@ class DefaultFirebaseOptions {
     appId: '1:192098989997:ios:3383f249b83240a5aa5324',
     messagingSenderId: '192098989997',
     projectId: 'fodo-70bc6',
+    databaseURL: 'https://fodo-70bc6-default-rtdb.firebaseio.com',
     storageBucket: 'fodo-70bc6.firebasestorage.app',
     iosBundleId: 'com.example.fodo',
   );
@@ -82,6 +86,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '192098989997',
     projectId: 'fodo-70bc6',
     authDomain: 'fodo-70bc6.firebaseapp.com',
+    databaseURL: 'https://fodo-70bc6-default-rtdb.firebaseio.com',
     storageBucket: 'fodo-70bc6.firebasestorage.app',
     measurementId: 'G-XL1V48BPVC',
   );

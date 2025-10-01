@@ -14,7 +14,7 @@ class RegisterPage extends StatelessWidget {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -116,7 +116,7 @@ class RegisterPage extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 40,
-                backgroundColor: color.withOpacity(0.1),
+                backgroundColor: color.withValues(alpha: 0.1),
                 child: Icon(
                   icon,
                   size: 40,
