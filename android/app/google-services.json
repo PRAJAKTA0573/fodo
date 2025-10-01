@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "192098989997",
+    "project_id": "fodo-70bc6",
+    "storage_bucket": "fodo-70bc6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:192098989997:android:2d5c07c3ca484b61aa5324",
+        "android_client_info": {
+          "package_name": "com.example.fodo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlNCn9T4uS8eZadohsEkItpnEumFqvH-Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
