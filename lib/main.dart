@@ -7,6 +7,7 @@ import 'services/realtime_database_service.dart';
 import 'services/donation_service.dart';
 import 'services/image_upload_service.dart';
 import 'services/location_service.dart';
+import 'services/ngo_service.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
 import 'features/auth/presentation/pages/login_page.dart';
@@ -14,6 +15,9 @@ import 'features/auth/presentation/pages/home_page.dart';
 import 'features/donor/data/repositories/donation_repository_impl.dart';
 import 'features/donor/presentation/providers/donation_provider.dart';
 import 'features/donor/presentation/pages/donor_dashboard_page.dart';
+import 'features/ngo/data/repositories/ngo_repository_impl.dart';
+import 'features/ngo/presentation/providers/ngo_provider.dart';
+import 'features/ngo/presentation/pages/ngo_dashboard_page.dart';
 import 'core/constants/app_constants.dart';
 
 void main() async {
@@ -40,6 +44,7 @@ class MyApp extends StatelessWidget {
         Provider(create: (_) => DonationService()),
         Provider(create: (_) => ImageUploadService()),
         Provider(create: (_) => LocationService()),
+        Provider(create: (_) => NGOService()),
         
         // Repositories
         ProxyProvider2<FirebaseAuthService, RealtimeDatabaseService, AuthRepositoryImpl>(
@@ -49,6 +54,10 @@ class MyApp extends StatelessWidget {
         ProxyProvider2<DonationService, ImageUploadService, DonationRepositoryImpl>(
           update: (_, donationService, imageService, __) =>
               DonationRepositoryImpl(donationService, imageService),
+        ),
+        ProxyProvider2<NGOService, RealtimeDatabaseService, NGORepositoryImpl>(
+          update: (_, ngoService, dbService, __) =>
+              NGORepositoryImpl(ngoService, dbService),
         ),
         
         // Providers
@@ -68,6 +77,26 @@ class MyApp extends StatelessWidget {
             }
             return donationProvider ?? DonationProvider(
               context.read<DonationRepositoryImpl>(),
+            );
+          },
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, NGOProvider>(
+          create: (context) => NGOProvider(
+            context.read<NGORepositoryImpl>(),
+            '', // Will be set when user is authenticated
+          ),
+          update: (context, authProvider, ngoProvider) {
+            // Create new provider when NGO user logs in
+            if (authProvider.currentUser != null && 
+                authProvider.currentUser!.userType == UserType.ngo) {
+              return NGOProvider(
+                context.read<NGORepositoryImpl>(),
+                authProvider.currentUser!.userId,
+              );
+            }
+            return ngoProvider ?? NGOProvider(
+              context.read<NGORepositoryImpl>(),
+              '',
             );
           },
         ),
@@ -119,8 +148,7 @@ class MyApp extends StatelessWidget {
               if (userType == UserType.donor) {
                 return const DonorDashboardPage();
               } else if (userType == UserType.ngo) {
-                // TODO: Navigate to NGO dashboard
-                return const HomePage();
+                return const NGODashboardPage();
               } else {
                 // Default to home page for admin or unknown type
                 return const HomePage();
