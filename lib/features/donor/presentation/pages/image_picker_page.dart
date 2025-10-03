@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart' as img_picker;
 import 'package:permission_handler/permission_handler.dart';
+import '../../../../core/constants/app_constants.dart';
 
 /// Image Picker Page - Select photos from camera or gallery
 class ImagePickerPage extends StatefulWidget {
@@ -159,6 +160,20 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
   @override
   Widget build(BuildContext context) {
     final canAddMore = _selectedImages.length < widget.maxImages;
+
+    if (!AppConstants.imagesEnabled) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Select Photos'),
+        ),
+        body: Center(
+          child: Text(
+            'Photo selection is disabled',
+            style: TextStyle(color: Colors.grey[600]),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(

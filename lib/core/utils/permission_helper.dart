@@ -66,7 +66,7 @@ class PermissionHelper {
   }
 
   /// Open app settings
-  static Future<void> openAppSettings() async {
+  static Future<void> openSettings() async {
     await openAppSettings();
   }
 
@@ -89,7 +89,7 @@ class PermissionHelper {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              openAppSettings();
+              openSettings();
             },
             child: const Text('Open Settings'),
           ),

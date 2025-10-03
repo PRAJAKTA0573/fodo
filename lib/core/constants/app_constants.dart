@@ -37,6 +37,7 @@ class AppConstants {
   static const String keyLanguage = 'language';
   
   // Donation Settings
+  static const bool imagesEnabled = false; // Toggle to enable/disable image upload and display
   static const int maxDonationPhotos = 5;
   static const int maxImageSizeMB = 10;
   static const int defaultSearchRadius = 10; // km

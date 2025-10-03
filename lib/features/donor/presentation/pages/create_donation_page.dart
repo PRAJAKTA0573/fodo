@@ -21,7 +21,7 @@ class _CreateDonationPageState extends State<CreateDonationPage> {
   final _pageController = PageController();
   
   int _currentStep = 0;
-  final int _totalSteps = 4;
+  int _totalSteps = AppConstants.imagesEnabled ? 4 : 3;
 
   // Form fields
   FoodType _selectedFoodType = FoodType.cookedFood;
@@ -82,30 +82,52 @@ class _CreateDonationPageState extends State<CreateDonationPage> {
   }
 
   bool _validateCurrentStep() {
-    switch (_currentStep) {
-      case 0: // Food Details
-        if (!_formKey.currentState!.validate()) return false;
-        if (_descriptionController.text.trim().isEmpty) {
-          _showError('Please provide a food description');
-          return false;
-        }
-        return true;
-      case 1: // Photos
-        if (_selectedPhotos.isEmpty) {
-          _showError('Please add at least one photo');
-          return false;
-        }
-        return true;
-      case 2: // Location
-        if (_selectedLocation == null) {
-          _showError('Please select pickup location');
-          return false;
-        }
-        return true;
-      case 3: // Review
-        return true;
-      default:
-        return true;
+    if (AppConstants.imagesEnabled) {
+      switch (_currentStep) {
+        case 0: // Food Details
+          if (!_formKey.currentState!.validate()) return false;
+          if (_descriptionController.text.trim().isEmpty) {
+            _showError('Please provide a food description');
+            return false;
+          }
+          return true;
+        case 1: // Photos
+          if (_selectedPhotos.isEmpty) {
+            _showError('Please add at least one photo');
+            return false;
+          }
+          return true;
+        case 2: // Location
+          if (_selectedLocation == null) {
+            _showError('Please select pickup location');
+            return false;
+          }
+          return true;
+        case 3: // Review
+          return true;
+        default:
+          return true;
+      }
+    } else {
+      switch (_currentStep) {
+        case 0: // Food Details
+          if (!_formKey.currentState!.validate()) return false;
+          if (_descriptionController.text.trim().isEmpty) {
+            _showError('Please provide a food description');
+            return false;
+          }
+          return true;
+        case 1: // Location
+          if (_selectedLocation == null) {
+            _showError('Please select pickup location');
+            return false;
+          }
+          return true;
+        case 2: // Review
+          return true;
+        default:
+          return true;
+      }
     }
   }
 
@@ -178,11 +200,15 @@ class _CreateDonationPageState extends State<CreateDonationPage> {
       ),
     );
 
-    // Create donation with photos
-    final success = await donationProvider.createDonationWithPhotos(
-      donation,
-      _selectedPhotos,
-    );
+    // Create donation (with or without photos based on config)
+    final success = AppConstants.imagesEnabled
+        ? await donationProvider.createDonationWithPhotos(
+            donation,
+            _selectedPhotos,
+          )
+        : await donationProvider.createDonation(
+            donation,
+          );
 
     // Close loading dialog
     if (mounted) Navigator.pop(context);
@@ -228,7 +254,7 @@ class _CreateDonationPageState extends State<CreateDonationPage> {
               physics: const NeverScrollableScrollPhysics(),
               children: [
                 _buildFoodDetailsStep(),
-                _buildPhotosStep(),
+                if (AppConstants.imagesEnabled) _buildPhotosStep(),
                 _buildLocationStep(),
                 _buildReviewStep(),
               ],
@@ -641,23 +667,25 @@ class _CreateDonationPageState extends State<CreateDonationPage> {
 
           const SizedBox(height: 16),
 
-          _buildReviewSection('Photos', [
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _selectedPhotos.map((photo) {
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.file(
-                    photo,
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  ),
-                );
-              }).toList(),
-            ),
-          ]),
+          if (AppConstants.imagesEnabled && _selectedPhotos.isNotEmpty) ...[
+            _buildReviewSection('Photos', [
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _selectedPhotos.map((photo) {
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.file(
+                      photo,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ]),
+          ],
 
           const SizedBox(height: 16),
 

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../providers/ngo_provider.dart';
 import '../../../donor/data/models/donation_model.dart';
+import '../../../../core/constants/app_constants.dart';
 
 class DonationDetailsNGOPage extends StatefulWidget {
   final DonationModel donation;
@@ -43,7 +44,7 @@ class _DonationDetailsNGOPageState extends State<DonationDetailsNGOPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Photo Gallery
-            _buildPhotoGallery(),
+            if (AppConstants.imagesEnabled) _buildPhotoGallery(),
             
             Padding(
               padding: const EdgeInsets.all(16),

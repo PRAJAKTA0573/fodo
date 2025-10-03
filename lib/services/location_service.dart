@@ -1,20 +1,20 @@
 import 'package:dartz/dartz.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:permission_handler/permission_handler.dart' as ph;
 
 /// Location Service - Handles location detection and geocoding
 class LocationService {
   /// Check if location permission is granted
   Future<bool> checkLocationPermission() async {
-    final status = await Permission.location.status;
+    final status = await ph.Permission.location.status;
     return status.isGranted;
   }
 
   /// Request location permission
   Future<Either<String, bool>> requestLocationPermission() async {
     try {
-      final status = await Permission.location.request();
+      final status = await ph.Permission.location.request();
       
       if (status.isGranted) {
         return const Right(true);
@@ -190,7 +190,7 @@ class LocationService {
 
   /// Open app settings
   Future<void> openAppSettings() async {
-    await openAppSettings();
+    await ph.openAppSettings();
   }
 
   /// Helper method to build full address string

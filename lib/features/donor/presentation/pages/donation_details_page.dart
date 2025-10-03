@@ -63,7 +63,7 @@ class _DonationDetailsPageState extends State<DonationDetailsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Photo Gallery
-            if (donation.foodDetails.photos.isNotEmpty)
+            if (AppConstants.imagesEnabled && donation.foodDetails.photos.isNotEmpty)
               _buildPhotoGallery(donation.foodDetails.photos),
 
             // Status Banner

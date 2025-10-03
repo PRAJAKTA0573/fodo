@@ -11,13 +11,11 @@ import 'services/ngo_service.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
 import 'features/auth/presentation/pages/login_page.dart';
-import 'features/auth/presentation/pages/home_page.dart';
+import 'features/auth/presentation/pages/role_selection_page.dart';
 import 'features/donor/data/repositories/donation_repository_impl.dart';
 import 'features/donor/presentation/providers/donation_provider.dart';
-import 'features/donor/presentation/pages/donor_dashboard_page.dart';
 import 'features/ngo/data/repositories/ngo_repository_impl.dart';
 import 'features/ngo/presentation/providers/ngo_provider.dart';
-import 'features/ngo/presentation/pages/ngo_dashboard_page.dart';
 import 'core/constants/app_constants.dart';
 import 'core/theme/app_theme.dart';
 
@@ -131,18 +129,11 @@ class MyApp extends StatelessWidget {
               );
             }
 
-            // Navigate based on auth status and user type
+            // Navigate based on auth status
             if (authProvider.isAuthenticated) {
-              final userType = authProvider.currentUser?.userType;
-              
-              if (userType == UserType.donor) {
-                return const DonorDashboardPage();
-              } else if (userType == UserType.ngo) {
-                return const NGODashboardPage();
-              } else {
-                // Default to home page for admin or unknown type
-                return const HomePage();
-              }
+              // Show role selection page after login
+              // Users can choose to continue as Donor or NGO
+              return const RoleSelectionPage();
             } else {
               return const LoginPage();
             }

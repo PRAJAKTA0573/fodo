@@ -43,36 +43,54 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
   }
 
   Future<void> _getCurrentLocation() async {
-    setState(() => _isLoadingLocation = true);
+    try {
+      setState(() => _isLoadingLocation = true);
 
-    final result = await _locationService.getCurrentLocation();
+      final result = await _locationService.getCurrentLocation();
 
-    result.fold(
-      (error) {
-        // Use default location if current location fails
-        setState(() {
-          _selectedLocation = _defaultLocation;
-          _isLoadingLocation = false;
-        });
-        _getAddressFromLocation(_defaultLocation);
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Could not get current location: $error'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-      },
-      (position) {
-        final location = LatLng(position.latitude, position.longitude);
-        setState(() {
-          _selectedLocation = location;
-          _isLoadingLocation = false;
-        });
-        _getAddressFromLocation(location);
-        _animateToLocation(location);
-      },
-    );
+      if (!mounted) return;
+
+      result.fold(
+        (error) {
+          // Use default location if current location fails
+          setState(() {
+            _selectedLocation = _defaultLocation;
+            _isLoadingLocation = false;
+          });
+          _getAddressFromLocation(_defaultLocation);
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Could not get current location: $error'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        },
+        (position) {
+          final location = LatLng(position.latitude, position.longitude);
+          setState(() {
+            _selectedLocation = location;
+            _isLoadingLocation = false;
+          });
+          _getAddressFromLocation(location);
+          _animateToLocation(location);
+        },
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _selectedLocation = _defaultLocation;
+        _isLoadingLocation = false;
+      });
+      _getAddressFromLocation(_defaultLocation);
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error getting location: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   Future<void> _getAddressFromLocation(LatLng location) async {

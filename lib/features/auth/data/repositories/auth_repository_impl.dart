@@ -486,4 +486,32 @@ class AuthRepositoryImpl {
       return Left(e.toString());
     }
   }
+
+  /// Update user type (for role switching)
+  Future<Either<String, UserModel>> updateUserType({
+    required String userId,
+    required UserType userType,
+  }) async {
+    try {
+      _logger.i('Updating user type to: ${userType.value}');
+      
+      await _dbService.updateUser(userId, {
+        'userType': userType.value,
+        'updatedAt': DateTime.now().millisecondsSinceEpoch,
+      });
+
+      // Get updated user
+      final userData = await _dbService.getUser(userId);
+      if (userData == null) {
+        return const Left('Failed to fetch updated user');
+      }
+
+      final user = UserModel.fromDatabase(userData, userId);
+      _logger.i('User type updated successfully');
+      return Right(user);
+    } catch (e) {
+      _logger.e('Update user type error: $e');
+      return Left(e.toString());
+    }
+  }
 }

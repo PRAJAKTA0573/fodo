@@ -220,7 +220,7 @@ class _DonationHistoryPageState extends State<DonationHistoryPage> {
                       color: _getStatusColor(donation.status).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: donation.foodDetails.photos.isNotEmpty
+                    child: (AppConstants.imagesEnabled && donation.foodDetails.photos.isNotEmpty)
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.network(

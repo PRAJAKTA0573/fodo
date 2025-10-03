@@ -522,4 +522,30 @@ class AuthProvider extends ChangeNotifier {
       },
     );
   }
+
+  /// Update user type (for role selection)
+  Future<bool> updateUserType(UserType newUserType) async {
+    if (_currentUser == null) return false;
+
+    _errorMessage = null;
+    notifyListeners();
+
+    final result = await _authRepository.updateUserType(
+      userId: _currentUser!.userId,
+      userType: newUserType,
+    );
+
+    return result.fold(
+      (error) {
+        _errorMessage = error;
+        notifyListeners();
+        return false;
+      },
+      (updatedUser) {
+        _currentUser = updatedUser;
+        notifyListeners();
+        return true;
+      },
+    );
+  }
 }
